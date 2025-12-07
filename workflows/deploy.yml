@@ -1,0 +1,42 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    # Review gh-pages docs if you want to deploy from other branches
+    # https://docusaurus.io/docs/deployment#deploying-to-github-pages
+
+jobs:
+  deploy:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: physical-ai-humanoid-textbook
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: physical-ai-humanoid-textbook/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+      - name: Build website
+        run: npm run build
+
+      # Popular action to deploy to GitHub Pages:
+      # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          # Build output to publish to the `gh-pages` branch:
+          publish_dir: ./physical-ai-humanoid-textbook/build
+          # The following lines deploy to a separate repo (e.g. user/user.github.io)
+          # Docs: https://github.com/peaceiris/actions-gh-pages#%EF%B8%8F-docusaurus
+          # deploy_key: ${{ secrets.DEPLOY_KEY }}
+          # external_repository: user/user.github.io
+          # publish_branch: main
